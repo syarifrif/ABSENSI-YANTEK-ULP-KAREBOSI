@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Absensi • YANTEK ULP Karebosi</title>
+<style>
+  :root{ --bg:#0e0f12; --card:#171821; --muted:#9aa0aa; --primary:#f5c451; --accent:#6dd3fb; --line:#252736; --text:#e7e9ee; }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:#0e0f12;color:var(--text);font-family:ui-sans-serif,system-ui}
+  .container{max-width:980px;margin:0 auto;padding:24px}
+  .card{background:#171821;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+  .header{display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;gap:12px;align-items:center}
+  .brand img{width:46px;height:46px;border-radius:10px;object-fit:cover}
+  h1{margin:0;font-size:20px}
+  .clock{color:var(--primary);font-variant-numeric:tabular-nums;font-weight:600}
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 2px 6px}
+  input,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#111218;color:var(--text)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row-1{grid-template-columns:1fr}
+  .btn{background:linear-gradient(135deg,var(--primary),#ffd98f);color:#1b1b1b;border:none;font-weight:700}
+  .btn-ghost{background:#111218;color:var(--accent);border:1px solid #263041}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;border:1px solid var(--line);cursor:pointer;margin-right:8px}
+  .pill.active{background:rgba(245,196,81,.12);border-color:#3a2e12;color:var(--primary)}
+  .muted{color:var(--muted);font-size:12px;margin-top:6px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px;border-bottom:1px solid #252736;text-align:left}
+  th{color:#9aa0aa}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="card">
+    <div class="header">
+      <div class="brand">
+        <img src="logopln.png" alt="PLN" onerror="this.style.display='none'">
+        <div>
+          <h1>Absensi YANTEK ULP Karebosi</h1>
+          <div class="muted" id="who"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="clock" id="clock">--:--:--</div>
+        <button class="btn-ghost" id="btnLogout" type="button">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Absen -->
+  <div class="card">
+    <h3 style="margin-top:0">Form Absen</h3>
+
+    <label>Status</label>
+    <div id="statusGroup">
+      <span class="pill active" data-value="MASUK">MASUK</span>
+      <span class="pill" data-value="PULANG">PULANG</span>
+      <span class="pill" data-value="IZIN">IZIN</span>
+      <span class="pill" data-value="SAKIT">SAKIT</span>
+      <span class="pill" data-value="CUTI">CUTI</span>
+      <span class="pill" data-value="LEMBUR">LEMBUR</span>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>NIP (terisi dari login)</label>
+        <input id="nip" readonly>
+      </div>
+      <div>
+        <label>Nama</label>
+        <input id="nama" readonly>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Foto Selfie (opsional)</label>
+        <input type="file" id="foto" accept="image/*" capture="user">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button class="btn-ghost" id="btnLokasi" type="button">Ambil Lokasi</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Latitude</label>
+        <input id="lat" readonly>
+      </div>
+      <div>
+        <label>Longitude</label>
+        <input id="lng" readonly>
+      </div>
+    </div>
+
+    <div class="row row-1" style="margin-top:8px">
+      <button class="btn" id="btnKirim">Kirim Absensi</button>
+    </div>
+
+    <p class="muted" id="info">Siap untuk absen.</p>
+
+    <!-- anti-CORS form -->
+    <form id="formHidden" style="display:none" method="POST" target="sink"></form>
+    <input type="hidden" id="payload" name="payload" form="formHidden">
+    <iframe name="sink" id="sink" style="display:none"></iframe>
+  </div>
+
+  <!-- Laporan -->
+  <div class="card">
+    <h3 style="margin-top:0">Laporan</h3>
+
+    <div class="row">
+      <div class="row-1">
+        <label>Harian</label>
+        <div class="row">
+          <input type="date" id="dailyDate">
+          <button class="btn-ghost" id="btnDaily">Tampilkan</button>
+          <button class="btn" id="btnDailyCsv">Export CSV</button>
+        </div>
+      </div>
+      <div class="row-1">
+        <label>Bulanan</label>
+        <div class="row">
+          <input type="month" id="monthInput">
+          <button class="btn-ghost" id="btnMonthly">Tampilkan</button>
+          <button class="btn" id="btnMonthlyCsv">Export CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px; overflow:auto">
+      <table id="tbl">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="muted" id="lapInfo"></p>
+  </div>
+
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzIHujLVgvfgMSkvuifowzhfo1mEviizyLW_9tVtPo0f_Zz0qWzL1fxpHcWEwwNnqwE/exec"; // <-- ganti
+
+// ======= Guard Login =======
+(function guard(){
+  const nip = sessionStorage.getItem('abs_nip');
+  const nama= sessionStorage.getItem('abs_nama');
+  if (!nip || !nama){ location.href='login.html'; return; }
+  document.getElementById('nip').value = nip;
+  document.getElementById('nama').value = nama;
+  document.getElementById('who').textContent = `${nama} (${nip})`;
+})();
+
+// Logout
+document.getElementById('btnLogout').onclick = ()=>{
+  sessionStorage.clear();
+  location.href='login.html';
+};
+
+// jam
+setInterval(()=>{
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  document.getElementById('clock').textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+},1000);
+
+// status
+let STATUS='MASUK';
+document.getElementById('statusGroup').onclick = (e)=>{
+  const pill = e.target.closest('.pill'); if(!pill) return;
+  [...document.getElementById('statusGroup').children].forEach(x=>x.classList.remove('active'));
+  pill.classList.add('active'); STATUS = pill.dataset.value;
+};
+
+// lokasi
+document.getElementById('btnLokasi').onclick = ()=>{
+  setInfo('Mengambil lokasi…');
+  if (!navigator.geolocation) return setInfo('Peramban tidak mendukung GPS','warn');
+  navigator.geolocation.getCurrentPosition(p=>{
+    document.getElementById('lat').value = p.coords.latitude;
+    document.getElementById('lng').value = p.coords.longitude;
+    setInfo('Lokasi berhasil diambil','ok');
+  }, err=> setInfo('Gagal ambil lokasi: '+err.message,'err'), {enableHighAccuracy:true, timeout:10000});
+};
+
+function setInfo(t,cls){ const el=document.getElementById('info'); el.className='muted '+(cls||''); el.textContent=t; }
+
+// kirim (form + iframe)
+document.getElementById('btnKirim').onclick = async ()=>{
+  const nip = document.getElementById('nip').value.trim();
+  const nama= document.getElementById('nama').value.trim();
+
+  setInfo('Menyiapkan & mengirim data…');
+  const f = document.getElementById('foto').files[0];
+  let fotoB64='', fotoType='';
+  if (f){
+    fotoType = f.type;
+    fotoB64 = await fileToBase64(f);
+    fotoB64 = fotoB64.replace(/^data:\w+\/[\w.+-]+;base64,/, '');
+  }
+  const payload = {
+    nip, status:STATUS, nama,
+    lat: document.getElementById('lat').value,
+    lng: document.getElementById('lng').value,
+    foto: fotoB64, fotoType
+  };
+
+  const form = document.getElementById('formHidden');
+  form.action = API_URL;
+  document.getElementById('payload').value = JSON.stringify(payload);
+  const sink = document.getElementById('sink');
+  sink.onload = ()=> setInfo('Terkirim. Cek laporan.','ok');
+  form.submit();
+};
+
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file);
+  });
+}
+
+// Laporan
+document.getElementById('btnDaily').onclick = async ()=>{
+  const date = document.getElementById('dailyDate').value || new Date().toISOString().slice(0,10);
+  const res = await fetch(`${API_URL}?action=report&type=daily&date=${date}`);
+  const json = await res.json();
+  renderDaily(json.data||[], date);
+};
+document.getElementById('btnMonthly').onclick = async ()=>{
+  const month = document.getElementById('monthInput').value || new Date().toISOString().slice(0,7);
+  const res = await fetch(`${API_URL}?action=report&type=monthly&month=${month}`);
+  const json = await res.json();
+  renderMonthly(json.data||[], month);
+};
+document.getElementById('btnDailyCsv').onclick = ()=>{
+  if (!currentDailyRows.length) return alert('Tampilkan laporan harian dulu.');
+  const date = document.getElementById('dailyDate').value || new Date().toISOString().slice(0,10);
+  const csv = toCSV([['Tanggal',date],[],['NIP','Nama','Status','Masuk','Pulang','DurasiJam','LemburJam'],
+    ...currentDailyRows.map(r=>[r.nip,r.nama,r.status,r.masuk,r.pulang,r.durasiJam,r.lemburJam])]);
+  downloadFile(csv, `Laporan-Harian-${date}.csv`);
+};
+document.getElementById('btnMonthlyCsv').onclick = ()=>{
+  if (!currentMonthlyRows.length) return alert('Tampilkan laporan bulanan dulu.');
+  const month = document.getElementById('monthInput').value || new Date().toISOString().slice(0,7);
+  const csv = toCSV([['Bulan',month],[],['NIP','Nama','Hadir','Izin','Sakit','Cuti','Hari Lembur','Total Jam','Total Lembur'],
+    ...currentMonthlyRows.map(r=>[r.nip,r.nama,r.hadir,r.izin,r.sakit,r.cuti,r.lemburHari,r.totalJam,r.totalLembur])]);
+  downloadFile(csv, `Laporan-Bulanan-${month}.csv`);
+};
+
+let currentDailyRows=[], currentMonthlyRows=[];
+function renderDaily(rows, date){
+  currentDailyRows = rows;
+  thead.innerHTML = '<tr><th>NIP</th><th>Nama</th><th>Status</th><th>Masuk</th><th>Pulang</th><th>Durasi (jam)</th><th>Lembur (jam)</th></tr>';
+  tbody.innerHTML = rows.map(r=>`<tr>
+    <td>${r.nip}</td><td>${r.nama}</td><td>${r.status}</td>
+    <td>${r.masuk||''}</td><td>${r.pulang||''}</td>
+    <td>${r.durasiJam||0}</td><td>${r.lemburJam||0}</td>
+  </tr>`).join('');
+  lapInfo.textContent = `Harian: ${date} — ${rows.length} baris.`;
+}
+function renderMonthly(rows, month){
+  currentMonthlyRows = rows;
+  thead.innerHTML = '<tr><th>NIP</th><th>Nama</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Cuti</th><th>Hari Lembur</th><th>Total Jam</th><th>Total Lembur</th></tr>';
+  tbody.innerHTML = rows.map(r=>`<tr>
+    <td>${r.nip}</td><td>${r.nama}</td>
+    <td>${r.hadir||0}</td><td>${r.izin||0}</td><td>${r.sakit||0}</td><td>${r.cuti||0}</td>
+    <td>${r.lemburHari||0}</td><td>${r.totalJam||0}</td><td>${r.totalLembur||0}</td>
+  </tr>`).join('');
+  lapInfo.textContent = `Bulanan: ${month} — ${rows.length} baris.`;
+}
+function toCSV(rows){
+  return rows.map(r=>r.map(v=>{
+    const s = String(v==null?'':v);
+    return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }).join(',')).join('\n');
+}
+function downloadFile(text, filename){
+  const blob = new Blob([text], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+}
+</script>
+
+<!-- refs for faster DOM -->
+<script>
+const thead = document.getElementById('thead');
+const tbody = document.getElementById('tbody');
+const lapInfo = document.getElementById('lapInfo');
+</script>
+</body>
+</html>
