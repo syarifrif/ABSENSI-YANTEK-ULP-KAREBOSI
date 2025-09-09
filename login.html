@@ -41,35 +41,55 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbw4iiUM5-j6FFHqeoxjdf4w0vaVlTF9XFjB-8zv9P35RsKqQvgb4UlhR0KX7gAR7r4/exec"; // <-- GANTI ke URL /exec
+const API_URL = "https://script.google.com/macros/s/AKfycbwtLpoD_eUDZt7XlraVNC-qO8WPnosnQmUTtsFepJJ4j5MzPZQSRlCpB0heev27fBLH/exec"; // <-- pastikan /exec
 
 document.getElementById('btnLogin').onclick = async ()=>{
   const nip = document.getElementById('nip').value.trim();
   const pin = document.getElementById('pin').value.trim();
   const msg = document.getElementById('msg'); msg.textContent='';
-
   if(!nip){ msg.textContent='NIP wajib diisi'; return; }
 
+  // 1) Coba fetch biasa dulu
   try{
     const url = `${API_URL}?action=auth&nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}`;
     const res = await fetch(url, {method:'GET', redirect:'follow'});
     const text = await res.text();
     let j; try{ j = JSON.parse(text); }catch(e){
-      msg.textContent = 'Respon bukan JSON: ' + text.slice(0,180);
-      return;
+      // bukan JSON -> fallback JSONP
+      return jsonpLogin(nip, pin);
     }
     if(!j.ok){ msg.textContent = j.message || 'Gagal login'; return; }
-
-    sessionStorage.setItem('abs_nip', j.nip);
-    sessionStorage.setItem('abs_nama', j.nama);
-    sessionStorage.setItem('abs_role', j.role || 'user');
-    location.href = 'app.html';
+    finishLogin(j);
   }catch(e){
-    msg.textContent = 'Tidak bisa menghubungi server: ' + (e.message || e);
+    // fetch gagal -> fallback JSONP
+    jsonpLogin(nip, pin);
   }
 };
+
+function jsonpLogin(nip, pin){
+  const msg = document.getElementById('msg'); msg.textContent='Mencoba mode aman (JSONP)…';
+  const cb = '__authCb_' + Math.random().toString(36).slice(2);
+  window[cb] = (j)=>{
+    delete window[cb];
+    script.remove();
+    if(!j || !j.ok){ msg.textContent = (j && j.message) ? j.message : 'Gagal login'; return; }
+    finishLogin(j);
+  };
+  const script = document.createElement('script');
+  script.src = `${API_URL}?action=auth&nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}&cb=${cb}`;
+  script.onerror = ()=>{ msg.textContent='Tidak bisa menghubungi server (JSONP)'; };
+  document.body.appendChild(script);
+}
+
+function finishLogin(j){
+  sessionStorage.setItem('abs_nip', j.nip);
+  sessionStorage.setItem('abs_nama', j.nama);
+  sessionStorage.setItem('abs_role', j.role || 'user');
+  location.href = 'app.html';
+}
 </script>
 </body>
 </html>
+
 
 
