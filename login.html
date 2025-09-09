@@ -1,5 +1,47 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login • Absensi YANTEK ULP Karebosi</title>
+<style>
+  :root{ --bg:#0e0f12; --card:#171821; --muted:#9aa0aa; --primary:#f5c451; --line:#252736; --text:#e7e9ee; }
+  *{box-sizing:border-box} body{margin:0;min-height:100vh;background:#0e0f12;color:var(--text);font-family:ui-sans-serif,system-ui}
+  .wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+  .card{width:100%;max-width:420px;background:#171821;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+  h1{margin:0 0 8px;font-size:20px}
+  .muted{color:var(--muted);font-size:12px;margin-bottom:14px}
+  label{display:block;font-size:13px;color:var(--muted);margin:12px 2px 6px}
+  input,button{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#111218;color:var(--text)}
+  .btn{background:linear-gradient(135deg,var(--primary),#ffd98f);color:#1a1a1a;font-weight:700;border:none;margin-top:12px}
+  .err{color:#ff7979;font-size:12px;margin-top:8px;min-height:16px}
+  .brand{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="brand">
+      <img src="pln.png" alt="PLN" style="width:40px;height:40px;border-radius:10px;object-fit:cover" onerror="this.style.display='none'">
+      <div>
+        <h1>Login Absensi</h1>
+        <div class="muted">YANTEK ULP Karebosi</div>
+      </div>
+    </div>
+
+    <label>NIP</label>
+    <input id="nip" placeholder="Contoh: 72321573MKS" autofocus>
+
+    <label>PIN (jika diwajibkan)</label>
+    <input id="pin" placeholder="Kosongkan jika tidak punya PIN" type="password">
+
+    <button class="btn" id="btnLogin">Masuk</button>
+    <div class="err" id="msg"></div>
+  </div>
+</div>
+
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzxLNF8r3kOJRB7sKC3PrnblDuJCyjDfLggBYxXP7OgMbyNQuxGfx7tw3bA21ejX5sV/exec"; // <-- pastikan /exec
+const API_URL = "PASTE_URL_EXEC_KAMU"; // <-- GANTI ke URL /exec
 
 document.getElementById('btnLogin').onclick = async ()=>{
   const nip = document.getElementById('nip').value.trim();
@@ -11,16 +53,11 @@ document.getElementById('btnLogin').onclick = async ()=>{
   try{
     const url = `${API_URL}?action=auth&nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}`;
     const res = await fetch(url, {method:'GET', redirect:'follow'});
-
-    const text = await res.text(); // ambil teks mentah untuk debug
-    let j;
-    try { j = JSON.parse(text); }
-    catch (e) {
-      // Tampilkan potongan respon agar tahu masalahnya
-      msg.textContent = 'Respon bukan JSON dari server: ' + text.slice(0,180);
+    const text = await res.text();
+    let j; try{ j = JSON.parse(text); }catch(e){
+      msg.textContent = 'Respon bukan JSON: ' + text.slice(0,180);
       return;
     }
-
     if(!j.ok){ msg.textContent = j.message || 'Gagal login'; return; }
 
     sessionStorage.setItem('abs_nip', j.nip);
@@ -32,4 +69,5 @@ document.getElementById('btnLogin').onclick = async ()=>{
   }
 };
 </script>
-
+</body>
+</html>
