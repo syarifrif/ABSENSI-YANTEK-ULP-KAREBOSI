@@ -35,7 +35,7 @@
   <div class="card">
     <div class="header">
       <div class="brand">
-        <img src="logopln.png" alt="PLN" onerror="this.style.display='none'">
+        <img src="pln.png" alt="PLN" onerror="this.style.display='none'">
         <div>
           <h1>Absensi YANTEK ULP Karebosi</h1>
           <div class="muted" id="who"></div>
@@ -142,9 +142,9 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzxLNF8r3kOJRB7sKC3PrnblDuJCyjDfLggBYxXP7OgMbyNQuxGfx7tw3bA21ejX5sV/exec"; // <-- ganti
+const API_URL = "PASTE_URL_EXEC_KAMU"; // <-- GANTI ke URL /exec
 
-// ======= Guard Login =======
+// ===== Guard Login =====
 (function guard(){
   const nip = sessionStorage.getItem('abs_nip');
   const nama= sessionStorage.getItem('abs_nama');
@@ -221,7 +221,7 @@ function fileToBase64(file){
   });
 }
 
-// Laporan
+// ===== Laporan =====
 document.getElementById('btnDaily').onclick = async ()=>{
   const date = document.getElementById('dailyDate').value || new Date().toISOString().slice(0,10);
   const res = await fetch(`${API_URL}?action=report&type=daily&date=${date}`);
@@ -291,4 +291,3 @@ const lapInfo = document.getElementById('lapInfo');
 </script>
 </body>
 </html>
-
