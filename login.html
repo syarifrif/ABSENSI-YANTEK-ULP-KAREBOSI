@@ -41,7 +41,7 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwtLpoD_eUDZt7XlraVNC-qO8WPnosnQmUTtsFepJJ4j5MzPZQSRlCpB0heev27fBLH/exec"; // <-- pastikan /exec
+const API_URL = "https://script.google.com/macros/s/AKfycbwtLpoD_eUDZt7XlraVNC-qO8WPnosnQmUTtsFepJJ4j5MzPZQSRlCpB0heev27fBLH/exec";
 
 document.getElementById('btnLogin').onclick = async ()=>{
   const nip = document.getElementById('nip').value.trim();
@@ -70,8 +70,7 @@ function jsonpLogin(nip, pin){
   const msg = document.getElementById('msg'); msg.textContent='Mencoba mode aman (JSONP)…';
   const cb = '__authCb_' + Math.random().toString(36).slice(2);
   window[cb] = (j)=>{
-    delete window[cb];
-    script.remove();
+    delete window[cb]; script.remove();
     if(!j || !j.ok){ msg.textContent = (j && j.message) ? j.message : 'Gagal login'; return; }
     finishLogin(j);
   };
@@ -90,6 +89,3 @@ function finishLogin(j){
 </script>
 </body>
 </html>
-
-
-
