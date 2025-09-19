@@ -164,12 +164,18 @@
     return r.json();
   }
   async function apiAbsen(payload){
-    const r = await fetch(API_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    return r.json();
+  // kirim sebagai form-urlencoded agar tidak kena CORS preflight
+  const body = new URLSearchParams();
+  body.append('payload', JSON.stringify(payload));
+
+  const r = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    body
+  });
+
+  // Apps Script balas JSON → parse
+  return r.json();
   }
 
   // ============ RENDER =============
@@ -292,4 +298,5 @@
 </script>
 </body>
 </html>
+
 
