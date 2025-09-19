@@ -1,296 +1,294 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Absensi • YANTEK ULP Karebosi</title>
-<style>
-  :root{ --bg:#0e0f12; --card:#171821; --muted:#9aa0aa; --primary:#f5c451; --accent:#6dd3fb; --line:#252736; --text:#e7e9ee; }
-  *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;background:#0e0f12;color:var(--text);font-family:ui-sans-serif,system-ui}
-  .container{max-width:980px;margin:0 auto;padding:24px}
-  .card{background:#171821;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
-  .header{display:flex;align-items:center;justify-content:space-between}
-  .brand{display:flex;gap:12px;align-items:center}
-  .brand img{width:46px;height:46px;border-radius:10px;object-fit:cover}
-  h1{margin:0;font-size:20px}
-  .clock{color:var(--primary);font-variant-numeric:tabular-nums;font-weight:600}
-  label{display:block;font-size:13px;color:var(--muted);margin:10px 2px 6px}
-  input,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#111218;color:var(--text)}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .row-1{grid-template-columns:1fr}
-  .btn{background:linear-gradient(135deg,var(--primary),#ffd98f);color:#1b1b1b;border:none;font-weight:700}
-  .btn-ghost{background:#111218;color:var(--accent);border:1px solid #263041}
-  .pill{display:inline-block;padding:8px 12px;border-radius:999px;border:1px solid var(--line);cursor:pointer;margin-right:8px}
-  .pill.active{background:rgba(245,196,81,.12);border-color:#3a2e12;color:var(--primary)}
-  .muted{color:var(--muted);font-size:12px;margin-top:6px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:8px;border-bottom:1px solid #252736;text-align:left}
-  th{color:#9aa0aa}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Absensi YANTEK ULP Karebosi — Dashboard</title>
+  <script src="config.js"></script>
+  <style>
+    :root { --bg:#0f172a; --card:#111827; --muted:#94a3b8; --txt:#e5e7eb; --brand:#38bdf8; }
+    body{margin:0;background:linear-gradient(160deg,#0b1220,#0f172a 45%,#0b1220);font-family:Inter,system-ui,Arial;color:var(--txt)}
+    .wrap{max-width:1100px;margin:20px auto;padding:16px}
+    .top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand img{height:40px}
+    .brand h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.3px}
+    .userbox{font-size:13px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .card{background:rgba(17,24,39,.75);backdrop-filter: blur(8px); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card h2{margin:0 0 10px 0;font-size:16px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+    .btn{background:linear-gradient(180deg,#1d4ed8,#0ea5e9);border:none;color:white;padding:10px 14px;border-radius:12px;font-weight:600;cursor:pointer}
+    .btn.secondary{background:#1f2937}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    input,select{background:#0b1220;border:1px solid #334155;color:#e5e7eb;padding:9px 10px;border-radius:10px}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    thead th{font-size:12px;color:#a8b2c1;text-align:left;padding:0 10px}
+    tbody td{background:#0b1220;border:1px solid #1f2a3a;padding:10px;border-left:none;border-right:none}
+    tbody tr{border-radius:10px; overflow:hidden}
+    .pill{padding:4px 8px;border-radius:999px;font-size:12px}
+    .ok{background:#065f46;color:#d1fae5}
+    .warn{background:#7c2d12;color:#ffedd5}
+    footer{margin-top:14px;font-size:12px;color:#9aa5b4}
+    .hr{height:1px;background:#1f2937;margin:10px 0}
+  </style>
 </head>
 <body>
-<div class="container">
-
-  <!-- Header -->
-  <div class="card">
-    <div class="header">
-      <div class="brand">
-        <img src="pln.png" alt="PLN" onerror="this.style.display='none'">
-        <div>
-          <h1>Absensi YANTEK ULP Karebosi</h1>
-          <div class="muted" id="who"></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <div class="clock" id="clock">--:--:--</div>
-        <button class="btn-ghost" id="btnLogout" type="button">Logout</button>
-      </div>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <!-- Logo PLN (silakan ganti file/logo sendiri jika ada) -->
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Logo_PLN.svg/320px-Logo_PLN.svg.png" alt="PLN"/>
+      <h1>Absensi YANTEK ULP Karebosi</h1>
+    </div>
+    <div class="userbox">
+      <div id="userName">—</div>
+      <div><span id="todayStr">—</span> · <a href="login.html" style="color:#93c5fd">Keluar</a></div>
     </div>
   </div>
 
   <!-- Form Absen -->
   <div class="card">
-    <h3 style="margin-top:0">Form Absen</h3>
-
-    <label>Status</label>
-    <div id="statusGroup">
-      <span class="pill active" data-value="MASUK">MASUK</span>
-      <span class="pill" data-value="PULANG">PULANG</span>
-      <span class="pill" data-value="IZIN">IZIN</span>
-      <span class="pill" data-value="SAKIT">SAKIT</span>
-      <span class="pill" data-value="CUTI">CUTI</span>
-      <span class="pill" data-value="LEMBUR">LEMBUR</span>
-    </div>
-
+    <h2>Form Absen</h2>
     <div class="row">
-      <div>
-        <label>NIP (terisi dari login)</label>
-        <input id="nip" readonly>
-      </div>
-      <div>
-        <label>Nama</label>
-        <input id="nama" readonly>
-      </div>
+      <input id="nip" placeholder="NIP" />
+      <input id="pin" placeholder="PIN (opsional)" />
+      <select id="status">
+        <option value="MASUK">MASUK</option>
+        <option value="PULANG">PULANG</option>
+        <option value="IZIN">IZIN</option>
+        <option value="SAKIT">SAKIT</option>
+        <option value="CUTI">CUTI</option>
+        <option value="LEMBUR">LEMBUR</option>
+      </select>
+      <button class="btn" id="btnAbsen">Kirim Absen</button>
+      <span id="msg" style="font-size:13px;color:#93c5fd"></span>
     </div>
-
-    <div class="row">
-      <div>
-        <label>Foto Selfie (opsional)</label>
-        <input type="file" id="foto" accept="image/*" capture="user">
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <button class="btn-ghost" id="btnLokasi" type="button">Ambil Lokasi</button>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Latitude</label>
-        <input id="lat" readonly>
-      </div>
-      <div>
-        <label>Longitude</label>
-        <input id="lng" readonly>
-      </div>
-    </div>
-
-    <div class="row row-1" style="margin-top:8px">
-      <button class="btn" id="btnKirim">Kirim Absensi</button>
-    </div>
-
-    <p class="muted" id="info">Siap untuk absen.</p>
-
-    <!-- anti-CORS form -->
-    <form id="formHidden" style="display:none" method="POST" target="sink"></form>
-    <input type="hidden" id="payload" name="payload" form="formHidden">
-    <iframe name="sink" id="sink" style="display:none"></iframe>
   </div>
 
-  <!-- Laporan -->
-  <div class="card">
-    <h3 style="margin-top:0">Laporan</h3>
-
-    <div class="row">
-      <div class="row-1">
-        <label>Harian</label>
-        <div class="row">
-          <input type="date" id="dailyDate">
-          <button class="btn-ghost" id="btnDaily">Tampilkan</button>
-          <button class="btn" id="btnDailyCsv">Export CSV</button>
-        </div>
+  <div class="grid">
+    <!-- Rekap Harian -->
+    <div class="card">
+      <h2>Rekap Hari Ini</h2>
+      <div class="row">
+        <input type="date" id="dateDaily"/>
+        <button class="btn secondary" id="btnReloadDaily">Muat</button>
+        <button class="btn" id="btnExportDaily">Export CSV</button>
       </div>
-      <div class="row-1">
-        <label>Bulanan</label>
-        <div class="row">
-          <input type="month" id="monthInput">
-          <button class="btn-ghost" id="btnMonthly">Tampilkan</button>
-          <button class="btn" id="btnMonthlyCsv">Export CSV</button>
-        </div>
-      </div>
-    </div>
-
-    <div style="margin-top:12px; overflow:auto">
-      <table id="tbl">
-        <thead id="thead"></thead>
-        <tbody id="tbody"></tbody>
+      <div class="hr"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>NIP</th><th>Nama</th><th>Status</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Lembur</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyDaily"><tr><td colspan="7">Belum ada data</td></tr></tbody>
       </table>
     </div>
-    <p class="muted" id="lapInfo"></p>
+
+    <!-- Rekap Bulanan -->
+    <div class="card">
+      <h2>Rekap Bulanan</h2>
+      <div class="row">
+        <input type="month" id="monthMonthly"/>
+        <button class="btn secondary" id="btnReloadMonthly">Muat</button>
+        <button class="btn" id="btnExportMonthly">Export CSV</button>
+      </div>
+      <div class="hr"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>NIP</th><th>Nama</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Cuti</th><th>Hari Lembur</th><th>Total Jam</th><th>Total Lembur</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyMonthly"><tr><td colspan="9">Belum ada data</td></tr></tbody>
+      </table>
+    </div>
   </div>
 
+  <footer>© <span id="year"></span> YANTEK ULP Karebosi · Data realtime dari Google Sheets.</footer>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxNkBIgKvSVLYPazOTSsf-8BUFupbGD_q2216XPyDrsuj1hsNqYb-L5R3nN-GQGntXx/exec";
-
-// ===== Guard Login =====
-(function guard(){
-  const nip = sessionStorage.getItem('abs_nip');
-  const nama= sessionStorage.getItem('abs_nama');
-  if (!nip || !nama){ location.href='login.html'; return; }
-  document.getElementById('nip').value = nip;
-  document.getElementById('nama').value = nama;
-  document.getElementById('who').textContent = `${nama} (${nip})`;
-})();
-
-// Logout
-document.getElementById('btnLogout').onclick = ()=>{
-  sessionStorage.clear();
-  location.href='login.html';
-};
-
-// jam
-setInterval(()=>{
-  const d=new Date(), p=n=>String(n).padStart(2,'0');
-  document.getElementById('clock').textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-},1000);
-
-// status
-let STATUS='MASUK';
-document.getElementById('statusGroup').onclick = (e)=>{
-  const pill = e.target.closest('.pill'); if(!pill) return;
-  [...document.getElementById('statusGroup').children].forEach(x=>x.classList.remove('active'));
-  pill.classList.add('active'); STATUS = pill.dataset.value;
-};
-
-// lokasi
-document.getElementById('btnLokasi').onclick = ()=>{
-  setInfo('Mengambil lokasi…');
-  if (!navigator.geolocation) return setInfo('Peramban tidak mendukung GPS','warn');
-  navigator.geolocation.getCurrentPosition(p=>{
-    document.getElementById('lat').value = p.coords.latitude;
-    document.getElementById('lng').value = p.coords.longitude;
-    setInfo('Lokasi berhasil diambil','ok');
-  }, err=> setInfo('Gagal ambil lokasi: '+err.message,'err'), {enableHighAccuracy:true, timeout:10000});
-};
-
-function setInfo(t,cls){ const el=document.getElementById('info'); el.className='muted '+(cls||''); el.textContent=t; }
-
-// kirim (form + iframe)
-document.getElementById('btnKirim').onclick = async ()=>{
-  const nip = document.getElementById('nip').value.trim();
-  const nama= document.getElementById('nama').value.trim();
-
-  setInfo('Menyiapkan & mengirim data…');
-  const f = document.getElementById('foto').files[0];
-  let fotoB64='', fotoType='';
-  if (f){
-    fotoType = f.type;
-    fotoB64 = await fileToBase64(f);
-    fotoB64 = fotoB64.replace(/^data:\w+\/[\w.+-]+;base64,/, '');
-  }
-  const payload = {
-    nip, status:STATUS, nama,
-    lat: document.getElementById('lat').value,
-    lng: document.getElementById('lng').value,
-    foto: fotoB64, fotoType
+  // ============ UTIL =============
+  const TZ = 'Asia/Makassar';
+  const fmtDate = (d)=> {
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}`;
+  };
+  const fmtMonth = (d)=>{
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    return `${y}-${m}`;
+  };
+  const toCSV = (rows, headers) => {
+    const esc = (s)=> `"${String(s??'').replace(/"/g,'""')}"`;
+    const head = headers.map(esc).join(',');
+    const body = rows.map(r=> headers.map(h=>esc(r[h])).join(',')).join('\n');
+    return head + '\n' + body;
+  };
+  const download = (filename, text) => {
+    const blob = new Blob([text], {type:'text/csv;charset=utf-8;'});
+    const url  = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
   };
 
-  const form = document.getElementById('formHidden');
-  form.action = API_URL;
-  document.getElementById('payload').value = JSON.stringify(payload);
-  const sink = document.getElementById('sink');
-  sink.onload = ()=> setInfo('Terkirim. Cek laporan.','ok');
-  form.submit();
-};
+  // ============ STATE ============
+  let profile = null; // {nip, nama, role} dari localStorage (di-set saat login)
 
-function fileToBase64(file){
-  return new Promise((resolve,reject)=>{
-    const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file);
-  });
-}
+  // ============ DOM ============
+  const el = (id)=>document.getElementById(id);
+  const tbodyDaily   = el('tbodyDaily');
+  const tbodyMonthly = el('tbodyMonthly');
 
-// ===== Laporan =====
-document.getElementById('btnDaily').onclick = async ()=>{
-  const date = document.getElementById('dailyDate').value || new Date().toISOString().slice(0,10);
-  const res = await fetch(`${API_URL}?action=report&type=daily&date=${date}`);
-  const json = await res.json();
-  renderDaily(json.data||[], date);
-};
-document.getElementById('btnMonthly').onclick = async ()=>{
-  const month = document.getElementById('monthInput').value || new Date().toISOString().slice(0,7);
-  const res = await fetch(`${API_URL}?action=report&type=monthly&month=${month}`);
-  const json = await res.json();
-  renderMonthly(json.data||[], month);
-};
-document.getElementById('btnDailyCsv').onclick = ()=>{
-  if (!currentDailyRows.length) return alert('Tampilkan laporan harian dulu.');
-  const date = document.getElementById('dailyDate').value || new Date().toISOString().slice(0,10);
-  const csv = toCSV([['Tanggal',date],[],['NIP','Nama','Status','Masuk','Pulang','DurasiJam','LemburJam'],
-    ...currentDailyRows.map(r=>[r.nip,r.nama,r.status,r.masuk,r.pulang,r.durasiJam,r.lemburJam])]);
-  downloadFile(csv, `Laporan-Harian-${date}.csv`);
-};
-document.getElementById('btnMonthlyCsv').onclick = ()=>{
-  if (!currentMonthlyRows.length) return alert('Tampilkan laporan bulanan dulu.');
-  const month = document.getElementById('monthInput').value || new Date().toISOString().slice(0,7);
-  const csv = toCSV([['Bulan',month],[],['NIP','Nama','Hadir','Izin','Sakit','Cuti','Hari Lembur','Total Jam','Total Lembur'],
-    ...currentMonthlyRows.map(r=>[r.nip,r.nama,r.hadir,r.izin,r.sakit,r.cuti,r.lemburHari,r.totalJam,r.totalLembur])]);
-  downloadFile(csv, `Laporan-Bulanan-${month}.csv`);
-};
+  // ============ API CALLS ============
+  async function apiReportDaily(dateStr){
+    const u = new URL(API_URL);
+    u.searchParams.set('action','report');
+    u.searchParams.set('type','daily');
+    u.searchParams.set('date',dateStr);
+    const r = await fetch(u.toString(), {method:'GET'});
+    return r.json();
+  }
+  async function apiReportMonthly(monthStr){
+    const u = new URL(API_URL);
+    u.searchParams.set('action','report');
+    u.searchParams.set('type','monthly');
+    u.searchParams.set('month',monthStr);
+    const r = await fetch(u.toString(), {method:'GET'});
+    return r.json();
+  }
+  async function apiAbsen(payload){
+    const r = await fetch(API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    return r.json();
+  }
 
-let currentDailyRows=[], currentMonthlyRows=[];
-function renderDaily(rows, date){
-  currentDailyRows = rows;
-  thead.innerHTML = '<tr><th>NIP</th><th>Nama</th><th>Status</th><th>Masuk</th><th>Pulang</th><th>Durasi (jam)</th><th>Lembur (jam)</th></tr>';
-  tbody.innerHTML = rows.map(r=>`<tr>
-    <td>${r.nip}</td><td>${r.nama}</td><td>${r.status}</td>
-    <td>${r.masuk||''}</td><td>${r.pulang||''}</td>
-    <td>${r.durasiJam||0}</td><td>${r.lemburJam||0}</td>
-  </tr>`).join('');
-  lapInfo.textContent = `Harian: ${date} — ${rows.length} baris.`;
-}
-function renderMonthly(rows, month){
-  currentMonthlyRows = rows;
-  thead.innerHTML = '<tr><th>NIP</th><th>Nama</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Cuti</th><th>Hari Lembur</th><th>Total Jam</th><th>Total Lembur</th></tr>';
-  tbody.innerHTML = rows.map(r=>`<tr>
-    <td>${r.nip}</td><td>${r.nama}</td>
-    <td>${r.hadir||0}</td><td>${r.izin||0}</td><td>${r.sakit||0}</td><td>${r.cuti||0}</td>
-    <td>${r.lemburHari||0}</td><td>${r.totalJam||0}</td><td>${r.totalLembur||0}</td>
-  </tr>`).join('');
-  lapInfo.textContent = `Bulanan: ${month} — ${rows.length} baris.`;
-}
-function toCSV(rows){
-  return rows.map(r=>r.map(v=>{
-    const s = String(v==null?'':v);
-    return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
-  }).join(',')).join('\n');
-}
-function downloadFile(text, filename){
-  const blob = new Blob([text], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-}
-</script>
+  // ============ RENDER =============
+  function renderDaily(list){
+    if (!list || list.length===0){
+      tbodyDaily.innerHTML = `<tr><td colspan="7">Belum ada data</td></tr>`;
+      return;
+    }
+    tbodyDaily.innerHTML = list.map(r=>{
+      const badge = r.status==='HADIR' ? 'ok' :
+                    (r.status==='IZIN'||r.status==='CUTI'||r.status==='SAKIT'||r.status==='LEMBUR' ? 'warn' : '');
+      return `<tr>
+        <td>${r.nip}</td>
+        <td>${r.nama}</td>
+        <td><span class="pill ${badge}">${r.status||''}</span></td>
+        <td>${r.masuk||''}</td>
+        <td>${r.pulang||''}</td>
+        <td>${r.durasiJam||0}</td>
+        <td>${r.lemburJam||0}</td>
+      </tr>`;
+    }).join('');
+  }
 
-<!-- refs for faster DOM -->
-<script>
-const thead = document.getElementById('thead');
-const tbody = document.getElementById('tbody');
-const lapInfo = document.getElementById('lapInfo');
+  function renderMonthly(list){
+    if (!list || list.length===0){
+      tbodyMonthly.innerHTML = `<tr><td colspan="9">Belum ada data</td></tr>`;
+      return;
+    }
+    tbodyMonthly.innerHTML = list.map(r=>`
+      <tr>
+        <td>${r.nip}</td>
+        <td>${r.nama}</td>
+        <td>${r.hadir||0}</td>
+        <td>${r.izin||0}</td>
+        <td>${r.sakit||0}</td>
+        <td>${r.cuti||0}</td>
+        <td>${r.lemburHari||0}</td>
+        <td>${r.totalJam||0}</td>
+        <td>${r.totalLembur||0}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ============ LOADERS ============
+  async function loadDaily(){
+    const dateStr = el('dateDaily').value;
+    const resp = await apiReportDaily(dateStr);
+    if (resp.ok) renderDaily(resp.data); else alert(resp.message||'Gagal load harian');
+  }
+  async function loadMonthly(){
+    const monthStr = el('monthMonthly').value;
+    const resp = await apiReportMonthly(monthStr);
+    if (resp.ok) renderMonthly(resp.data); else alert(resp.message||'Gagal load bulanan');
+  }
+
+  // ============ INIT ============
+  (function init(){
+    // tampilkan nama user (opsional)
+    try {
+      profile = JSON.parse(localStorage.getItem('absen_profile')||'null');
+      if (profile) el('userName').textContent = `${profile.nama} (${profile.nip})`;
+    } catch(e){}
+
+    // tanggal default (Asia/Makassar)
+    const now = new Date();
+    el('todayStr').textContent = now.toLocaleString('id-ID',{timeZone:'Asia/Makassar'});
+    el('dateDaily').value = fmtDate(now);
+    el('monthMonthly').value = fmtMonth(now);
+    el('year').textContent = now.getFullYear();
+
+    // event
+    el('btnReloadDaily').onclick = loadDaily;
+    el('btnReloadMonthly').onclick = loadMonthly;
+
+    el('btnExportDaily').onclick = async ()=>{
+      const dateStr = el('dateDaily').value;
+      const resp = await apiReportDaily(dateStr);
+      if (!resp.ok) return alert(resp.message||'Gagal export');
+      const headers = ['nip','nama','status','masuk','pulang','durasiJam','lemburJam'];
+      const csv = toCSV(resp.data, headers);
+      download(`rekap_harian_${dateStr}.csv`, csv);
+    };
+    el('btnExportMonthly').onclick = async ()=>{
+      const monthStr = el('monthMonthly').value;
+      const resp = await apiReportMonthly(monthStr);
+      if (!resp.ok) return alert(resp.message||'Gagal export');
+      const headers = ['nip','nama','hadir','izin','sakit','cuti','lemburHari','totalJam','totalLembur'];
+      const csv = toCSV(resp.data, headers);
+      download(`rekap_bulanan_${monthStr}.csv`, csv);
+    };
+
+    // submit absen
+    el('btnAbsen').onclick = async ()=>{
+      const nip = el('nip').value.trim();
+      const pin = el('pin').value.trim();
+      const status = el('status').value;
+      if (!nip) return alert('NIP wajib');
+
+      el('btnAbsen').disabled = true; el('msg').textContent = 'Mengirim...';
+      try {
+        const resp = await apiAbsen({nip, pin, status});
+        el('msg').textContent = resp.message || (resp.ok?'Berhasil':'Gagal');
+        if (resp.ok){
+          // refresh rekap supaya terlihat langsung
+          await loadDaily();
+          await loadMonthly();
+        }
+      } catch(err){
+        el('msg').textContent = 'Gagal kirim';
+      } finally {
+        el('btnAbsen').disabled = false;
+        setTimeout(()=>{ el('msg').textContent=''; }, 3000);
+      }
+    };
+
+    // load awal
+    loadDaily();
+    loadMonthly();
+  })();
 </script>
 </body>
 </html>
-
-
-
