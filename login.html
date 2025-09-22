@@ -1,43 +1,60 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login • Absensi YANTEK ULP Karebosi</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <script src="config.js"></script>
 </head>
-<body class="page">
+<body class="wrap">
   <div class="card">
-    <h1>Login</h1>
+    <h1>Absensi <span>YANTEK ULP Karebosi</span></h1>
+    <p class="muted">Silakan masuk dengan NIP & PIN Anda.</p>
+
     <label>NIP</label>
-    <input id="nip" placeholder="7232XXXXMKS" autocomplete="off">
+    <input id="nip" placeholder="Masukkan NIP" />
+
     <label>PIN</label>
-    <input id="pin" placeholder="Sesuai kolom PIN" type="password">
+    <input id="pin" placeholder="Masukkan PIN" type="password"/>
+
     <button id="btn">Masuk</button>
     <div id="msg" class="msg"></div>
   </div>
 
-<script>
-const $ = s => document.querySelector(s);
-$('#btn').onclick = async () => {
-  const nip = $('#nip').value.trim().toUpperCase();
-  const pin = $('#pin').value.trim();
-  $('#msg').textContent = 'Memeriksa...';
-  try {
-    const url = `${window.API_URL}?action=auth&nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}`;
-    const r = await fetch(url);
-    const j = await r.json();
-    if (j.ok) {
-      localStorage.setItem('auth', JSON.stringify({ nip, pin, nama: j.nama, role: j.role }));
-      location.href = 'app.html';
-    } else {
-      $('#msg').textContent = j.message || 'Gagal login';
-    }
-  } catch (e) {
-    $('#msg').textContent = 'Tidak bisa menghubungi server';
+  <script>
+  const $ = s => document.querySelector(s);
+
+  // JSONP helper untuk login (hindari CORS)
+  function authJSONP(nip, pin){
+    return new Promise((resolve, reject)=>{
+      const cb = 'cb'+Date.now();
+      window[cb] = data => { resolve(data); cleanup(); };
+      const url = `${window.API_URL}?action=auth&nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}&cb=${cb}`;
+      const tag = document.createElement('script');
+      function cleanup(){ delete window[cb]; tag.remove(); }
+      tag.src = url;
+      tag.onerror = ()=>{ cleanup(); reject(new Error('net')); };
+      document.body.appendChild(tag);
+    });
   }
-};
-</script>
+
+  $('#btn').onclick = async ()=>{
+    const nip = $('#nip').value.trim().toUpperCase();
+    const pin = $('#pin').value.trim();
+    $('#msg').textContent = 'Memeriksa...';
+    try{
+      const j = await authJSONP(nip, pin);
+      if (j.ok){
+        localStorage.setItem('auth', JSON.stringify({ nip, pin, nama:j.nama, role:j.role||'user' }));
+        location.href = 'app.html';
+      }else{
+        $('#msg').textContent = j.message || 'Gagal login';
+      }
+    }catch(e){
+      $('#msg').textContent = 'Tidak bisa menghubungi server';
+    }
+  };
+  </script>
 </body>
 </html>
