@@ -1,229 +1,228 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Absensi • YANTEK ULP Karebosi</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <script src="config.js"></script>
 </head>
-<body class="page">
-
-<header class="top">
-  <h1>Absensi YANTEK ULP Karebosi</h1>
-  <button id="logout">Keluar</button>
-</header>
-
-<section class="card">
-  <h2>Form Absen</h2>
-  <div class="grid">
-    <div>
-      <label>NIP</label>
-      <input id="nip">
+<body class="wrap">
+  <header class="topbar">
+    <div class="brand">Absensi <b>YANTEK ULP Karebosi</b></div>
+    <div class="user">
+      <span id="hello"></span>
+      <button id="logout" class="ghost">Keluar</button>
     </div>
-    <div>
-      <label>PIN</label>
-      <input id="pin" type="password">
+  </header>
+
+  <div class="card">
+    <h2>Form Absen</h2>
+
+    <div class="grid2">
+      <div>
+        <label>NIP</label>
+        <input id="nip" disabled />
+      </div>
+      <div>
+        <label>PIN</label>
+        <input id="pin" type="password" />
+      </div>
     </div>
-    <div>
-      <label>Status</label>
-      <select id="status">
-        <option>MASUK</option>
-        <option>PULANG</option>
-        <option>IZIN</option>
-        <option>SAKIT</option>
-        <option>CUTI</option>
-        <option>LEMBUR</option>
-      </select>
+
+    <div class="grid2">
+      <div>
+        <label>Status</label>
+        <select id="status">
+          <option>MASUK</option>
+          <option>PULANG</option>
+          <option>IZIN</option>
+          <option>SAKIT</option>
+          <option>CUTI</option>
+          <option>LEMBUR</option>
+        </select>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="kirim">Kirim Absen</button>
+      </div>
+    </div>
+
+    <div id="kirimStatus" class="msg"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="row">
+        <h3>Rekap Hari Ini</h3>
+        <div class="row gap">
+          <input type="date" id="tgl">
+          <button id="muatH">Muat</button>
+          <button id="csvH" class="ghost">Export CSV</button>
+        </div>
+      </div>
+      <div class="table">
+        <table id="tblH">
+          <thead><tr>
+            <th>NIP</th><th>Nama</th><th>Status</th>
+            <th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Lembur</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <h3>Rekap Bulanan</h3>
+        <div class="row gap">
+          <input type="month" id="bulan">
+          <button id="muatB">Muat</button>
+          <button id="csvB" class="ghost">Export CSV</button>
+        </div>
+      </div>
+      <div class="table">
+        <table id="tblB">
+          <thead><tr>
+            <th>NIP</th><th>Nama</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Cuti</th>
+            <th>Hari Lembur</th><th>Total Jam</th><th>Total Lembur</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div class="grid">
-    <div>
-      <label>Foto (opsional)</label>
-      <input id="foto" type="file" accept="image/*">
-    </div>
-    <div>
-      <label>&nbsp;</label>
-      <button id="btnGeo">Ambil Lokasi</button>
-      <span id="geoInfo"></span>
-    </div>
-  </div>
+  <footer class="muted center small">©2025 YANTEK ULP Karebosi • Data realtime dari Google Sheets</footer>
 
-  <button id="btnSend" class="primary">Kirim Absen</button>
-  <span id="sendMsg" class="msg"></span>
-</section>
+  <script>
+  const $ = s => document.querySelector(s);
+  const auth = JSON.parse(localStorage.getItem('auth') || '{}');
+  if (!auth.nip || !auth.pin){ location.href = 'login.html'; }
 
-<section class="card">
-  <h2>Rekap Hari Ini</h2>
-  <div class="row">
-    <input id="tgl" type="date">
-    <button id="loadDaily">Muat</button>
-    <button id="expDaily">Export CSV</button>
-  </div>
-  <table id="tblDaily">
-    <thead><tr>
-      <th>NIP</th><th>Nama</th><th>Status</th>
-      <th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Lembur</th>
-    </tr></thead>
-    <tbody></tbody>
-  </table>
-</section>
+  // isi header
+  $('#hello').textContent = auth.nama ? `${auth.nama} • ${auth.nip}` : auth.nip;
+  $('#nip').value = auth.nip;
+  $('#pin').value = auth.pin;
 
-<section class="card">
-  <h2>Rekap Bulanan</h2>
-  <div class="row">
-    <input id="bln" type="month">
-    <button id="loadMonthly">Muat</button>
-    <button id="expMonthly">Export CSV</button>
-  </div>
-  <table id="tblMonthly">
-    <thead><tr>
-      <th>NIP</th><th>Nama</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Cuti</th>
-      <th>Hari Lembur</th><th>Total Jam</th><th>Total Lembur</th>
-    </tr></thead>
-    <tbody></tbody>
-  </table>
-</section>
+  $('#logout').onclick = ()=>{ localStorage.removeItem('auth'); location.href='login.html'; };
 
-<footer class="foot">© 2025 YANTEK ULP Karebosi</footer>
-
-<script>
-// Helpers
-const $ = s => document.querySelector(s);
-const csv = rows => rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
-const download = (name, text) => {
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(text);
-  a.download = name; a.click();
-};
-
-// Ambil auth & isi field
-const auth = JSON.parse(localStorage.getItem('auth') || '{}');
-window.addEventListener('DOMContentLoaded', () => {
-  if (!auth.nip) location.href = 'login.html';
-  $('#nip').value = auth.nip;  $('#nip').readOnly = true;
-  $('#pin').value = auth.pin;  $('#pin').readOnly = true;
-
-  const today = new Date();
-  $('#tgl').value = today.toISOString().slice(0,10);
-  $('#bln').value = today.toISOString().slice(0,7);
-  loadDaily(); loadMonthly();
-});
-
-$('#logout').onclick = () => { localStorage.removeItem('auth'); location.href = 'login.html'; };
-
-// Lokasi
-let LAT='', LNG='';
-$('#btnGeo').onclick = () => {
-  if (!navigator.geolocation) return $('#geoInfo').textContent = 'Geolocation tidak tersedia';
-  navigator.geolocation.getCurrentPosition(pos=>{
-    LAT = pos.coords.latitude.toFixed(6);
-    LNG = pos.coords.longitude.toFixed(6);
-    $('#geoInfo').textContent = `${LAT}, ${LNG}`;
-  }, _=> $('#geoInfo').textContent='Gagal ambil lokasi');
-};
-
-// Encode foto → base64
-function readFile64(file){
-  return new Promise(res=>{
-    if(!file) return res({data:'', type:''});
-    const fr=new FileReader();
-    fr.onload=()=>res({data:fr.result.split(',')[1], type:file.type||''});
-    fr.readAsDataURL(file);
-  });
-}
-
-// Kirim absen (form-urlencoded → aman CORS)
-async function apiAbsen(payload){
-  const body = new URLSearchParams();
-  body.append('payload', JSON.stringify(payload));
-  const r = await fetch(window.API_URL, {
-    method:'POST',
-    headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
-    body
-  });
-  const text = await r.text();
-  try { return JSON.parse(text); } catch { return {ok:false, message:text||'Server error'}; }
-}
-
-$('#btnSend').onclick = async () => {
-  $('#sendMsg').textContent = 'Mengirim...';
-  const file = $('#foto').files[0];
-  const {data, type} = await readFile64(file);
-  const payload = {
-    nip: $('#nip').value.trim().toUpperCase(),
-    pin: $('#pin').value.trim(),
-    status: $('#status').value.trim().toUpperCase(),
-    lat: LAT, lng: LNG,
-    foto: data, fotoType: type
-  };
-  try {
-    const j = await apiAbsen(payload);
-    $('#sendMsg').textContent = j.ok ? j.message || 'Tersimpan' : (j.message || 'Gagal kirim');
-    if (j.ok) { $('#foto').value=''; loadDaily(); loadMonthly(); }
-  } catch(e){
-    $('#sendMsg').textContent = 'Gagal kirim';
+  // POST helper
+  async function postJSON(url, obj){
+    const res = await fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(obj)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
   }
-};
 
-// Muat Harian
-async function loadDaily(){
-  const date = $('#tgl').value;
-  const r = await fetch(`${window.API_URL}?action=report&type=daily&date=${encodeURIComponent(date)}`);
-  const j = await r.json();
-  const tb = $('#tblDaily tbody'); tb.innerHTML='';
-  (j.data||[]).forEach(row=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${row.nip||''}</td>
-      <td>${row.nama||''}</td>
-      <td>${row.status||''}</td>
-      <td>${row.masuk||''}</td>
-      <td>${row.pulang||''}</td>
-      <td>${row.durasiJam||0}</td>
-      <td>${row.lemburJam||0}</td>`;
-    tb.appendChild(tr);
-  });
-}
-$('#loadDaily').onclick = loadDaily;
-$('#expDaily').onclick = () => {
-  const rows = [['NIP','Nama','Status','Masuk','Pulang','Durasi','Lembur']];
-  [...$('#tblDaily tbody').rows].forEach(tr=>{
-    rows.push([...tr.cells].map(td=>td.textContent));
-  });
-  download(`rekap-harian-${$('#tgl').value}.csv`, csv(rows));
-};
+  // JSONP helper (untuk report agar aman CORS)
+  function getJSONP(url){
+    return new Promise((resolve, reject)=>{
+      const cb = 'cb'+Date.now();
+      window[cb] = d => { resolve(d); cleanup(); };
+      const tag = document.createElement('script');
+      function cleanup(){ delete window[cb]; tag.remove(); }
+      tag.src = url + (url.includes('?')?'&':'?') + 'cb=' + cb;
+      tag.onerror = ()=>{ cleanup(); reject(new Error('net')); };
+      document.body.appendChild(tag);
+    });
+  }
 
-// Muat Bulanan
-async function loadMonthly(){
-  const month = $('#bln').value;
-  const r = await fetch(`${window.API_URL}?action=report&type=monthly&month=${encodeURIComponent(month)}`);
-  const j = await r.json();
-  const tb = $('#tblMonthly tbody'); tb.innerHTML='';
-  (j.data||[]).forEach(row=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${row.nip||''}</td>
-      <td>${row.nama||''}</td>
-      <td>${row.hadir||0}</td>
-      <td>${row.izin||0}</td>
-      <td>${row.sakit||0}</td>
-      <td>${row.cuti||0}</td>
-      <td>${row.lemburHari||0}</td>
-      <td>${row.totalJam||0}</td>
-      <td>${row.totalLembur||0}</td>`;
-    tb.appendChild(tr);
-  });
-}
-$('#loadMonthly').onclick = loadMonthly;
-$('#expMonthly').onclick = () => {
-  const rows = [['NIP','Nama','Hadir','Izin','Sakit','Cuti','Hari Lembur','Total Jam','Total Lembur']];
-  [...$('#tblMonthly tbody').rows].forEach(tr=>{
-    rows.push([...tr.cells].map(td=>td.textContent));
-  });
-  download(`rekap-bulanan-${$('#bln').value}.csv`, csv(rows));
-};
-</script>
+  // Kirim Absen
+  $('#kirim').onclick = async ()=>{
+    $('#kirimStatus').textContent = 'Mengirim...';
+    try{
+      // ambil lokasi (opsional, abaikan error)
+      let lat='', lng='';
+      try {
+        const p = await new Promise((ok,er)=>navigator.geolocation.getCurrentPosition(ok,er,{timeout:5000}));
+        lat = p.coords.latitude; lng = p.coords.longitude;
+      }catch(_){}
+
+      const j = await postJSON(window.API_URL, {
+        nip: auth.nip,
+        pin: $('#pin').value.trim(),
+        status: $('#status').value,
+        lat, lng
+      });
+      $('#kirimStatus').textContent = j.ok ? j.message : (j.message||'Gagal kirim');
+      if (j.ok){ muatH(); muatB(); }   // refresh tabel
+    }catch(e){
+      $('#kirimStatus').textContent = 'Gagal kirim';
+    }
+  };
+
+  // Tabel harian
+  function renderH(data){
+    const tb = $('#tblH tbody'); tb.innerHTML='';
+    if (!data || !data.length){
+      tb.innerHTML = `<tr><td colspan="7" class="muted center">Belum ada data</td></tr>`;
+      return;
+    }
+    for (const r of data){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${r.nip}</td><td>${r.nama}</td><td>${r.status||''}</td>
+                      <td>${r.masuk||''}</td><td>${r.pulang||''}</td>
+                      <td>${r.durasiJam||0}</td><td>${r.lemburJam||0}</td>`;
+      tb.appendChild(tr);
+    }
+  }
+  // Tabel bulanan
+  function renderB(data){
+    const tb = $('#tblB tbody'); tb.innerHTML='';
+    if (!data || !data.length){
+      tb.innerHTML = `<tr><td colspan="9" class="muted center">Belum ada data</td></tr>`;
+      return;
+    }
+    for (const r of data){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${r.nip}</td><td>${r.nama}</td>
+        <td>${r.hadir||0}</td><td>${r.izin||0}</td><td>${r.sakit||0}</td><td>${r.cuti||0}</td>
+        <td>${r.lemburHari||0}</td><td>${r.totalJam||0}</td><td>${r.totalLembur||0}</td>`;
+      tb.appendChild(tr);
+    }
+  }
+
+  // Muat data harian & bulanan (JSONP)
+  async function muatH(){
+    const d = $('#tgl').value || new Date().toISOString().slice(0,10);
+    const u = `${window.API_URL}?action=report&type=daily&date=${encodeURIComponent(d)}`;
+    const j = await getJSONP(u);
+    renderH(j.data||[]);
+  }
+  async function muatB(){
+    const m = $('#bulan').value || new Date().toISOString().slice(0,7);
+    const u = `${window.API_URL}?action=report&type=monthly&month=${encodeURIComponent(m)}`;
+    const j = await getJSONP(u);
+    renderB(j.data||[]);
+  }
+
+  // CSV export
+  function tableToCSV(id){
+    const rows = [...document.querySelectorAll(`#${id} tr`)];
+    const csv = rows.map(r => [...r.children].map(td => {
+      const t = td.textContent.replaceAll('"','""');
+      return `"${t}"`;
+    }).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (id==='tblH'?'rekap-harian':'rekap-bulanan') + '.csv';
+    a.click();
+  }
+  $('#csvH').onclick = ()=>tableToCSV('tblH');
+  $('#csvB').onclick = ()=>tableToCSV('tblB');
+
+  // default tanggal/bulan & load
+  $('#tgl').value = new Date().toISOString().slice(0,10);
+  $('#bulan').value = new Date().toISOString().slice(0,7);
+  $('#muatH').onclick = muatH;
+  $('#muatB').onclick = muatB;
+
+  muatH(); muatB();
+  </script>
 </body>
 </html>
