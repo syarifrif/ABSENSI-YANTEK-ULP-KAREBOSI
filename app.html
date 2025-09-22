@@ -131,29 +131,43 @@
     });
   }
 
-  // Kirim Absen
-  $('#kirim').onclick = async ()=>{
-    $('#kirimStatus').textContent = 'Mengirim...';
-    try{
-      // ambil lokasi (opsional, abaikan error)
-      let lat='', lng='';
-      try {
-        const p = await new Promise((ok,er)=>navigator.geolocation.getCurrentPosition(ok,er,{timeout:5000}));
-        lat = p.coords.latitude; lng = p.coords.longitude;
-      }catch(_){}
+ // Kirim Absen
+$('#kirim').onclick = async ()=>{
+  $('#kirimStatus').textContent = 'Mengirim...';
+  try{
+    let lat='', lng='';
+    try {
+      const p = await new Promise((ok,er)=>navigator.geolocation.getCurrentPosition(ok,er,{timeout:5000}));
+      lat = p.coords.latitude; lng = p.coords.longitude;
+    }catch(_){}
 
-      const j = await postJSON(window.API_URL, {
-        nip: auth.nip,
-        pin: $('#pin').value.trim(),
-        status: $('#status').value,
-        lat, lng
-      });
-      $('#kirimStatus').textContent = j.ok ? j.message : (j.message||'Gagal kirim');
-      if (j.ok){ muatH(); muatB(); }   // refresh tabel
-    }catch(e){
-      $('#kirimStatus').textContent = 'Gagal kirim';
-    }
-  };
+    // payload
+    const payload = {
+      nip: auth.nip,
+      pin: $('#pin').value.trim(),
+      status: $('#status').value,
+      lat, lng
+    };
+
+    // kirim pakai form-urlencoded (lebih cocok untuk Apps Script doPost)
+    const formData = new URLSearchParams();
+    for (const k in payload) formData.append(k, payload[k]);
+
+    const res = await fetch(window.API_URL, {
+      method:'POST',
+      body: formData
+    });
+
+    const j = await res.json();
+    $('#kirimStatus').textContent = j.ok ? j.message : (j.message||'Gagal kirim');
+    if (j.ok){ muatH(); muatB(); }
+
+  }catch(e){
+    console.error(e);
+    $('#kirimStatus').textContent = 'Gagal kirim';
+  }
+};
+
 
   // Tabel harian
   function renderH(data){
@@ -226,3 +240,4 @@
   </script>
 </body>
 </html>
+
