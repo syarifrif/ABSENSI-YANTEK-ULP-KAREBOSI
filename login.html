@@ -57,10 +57,14 @@
       }else{
         $('#status').className='msg err'; $('#status').textContent = r.message || 'Gagal login';
       }
-    }catch(e){
-      $('#status').className='msg err'; $('#status').textContent='Tidak bisa menghubungi server';
-    }
+    } catch(e){
+  console.error(e);
+  document.querySelector('#status').className='msg err';
+  document.querySelector('#status').textContent='Tidak bisa menghubungi server: ' + e.message;
+}
+
   };
   </script>
 </body>
 </html>
+
