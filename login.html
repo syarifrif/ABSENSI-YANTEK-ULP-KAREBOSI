@@ -42,6 +42,39 @@
     });
   }
 
+  function hasStorage(){
+    try{
+      return typeof window.localStorage !== 'undefined';
+    }catch(_){
+      return false;
+    }
+  }
+
+  function saveAuth(auth){
+    if(!hasStorage()){ return false; }
+    try{
+      localStorage.setItem('auth', JSON.stringify(auth));
+      return true;
+    }catch(e){
+      console.warn('Tidak bisa menyimpan ke localStorage', e);
+      return false;
+    }
+  }
+
+  function encodeAuth(auth){
+    try{
+      return 'b64:' + btoa(encodeURIComponent(JSON.stringify(auth)));
+    }catch(e){
+      console.warn('Gagal menyiapkan data login untuk dikirim', e);
+      try{
+        return 'raw:' + encodeURIComponent(JSON.stringify(auth));
+      }catch(e2){
+        console.warn('Gagal menyiapkan data login cadangan', e2);
+        return '';
+      }
+    }
+  }
+
   $('#btn').onclick = async ()=>{
     $('#status').className='msg'; $('#status').textContent='Memeriksa...';
     const nip = $('#nip').value.trim();
@@ -53,8 +86,11 @@
       const url = `${window.API_URL}?action=auth&nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}`;
       const r = await getJSONP(url);
       if(r.ok){
-        localStorage.setItem('auth', JSON.stringify({ nip:r.nip, pin, nama:r.nama||'', role:r.role||'user' }));
-        location.href='app.html';
+        const auth = { nip:r.nip, pin, nama:r.nama||'', role:r.role||'user' };
+        saveAuth(auth);
+        const encoded = encodeAuth(auth);
+        const target = encoded ? `app.html#auth=${encoded}` : 'app.html';
+        location.href = target;
       }else{
         $('#status').className='msg err'; $('#status').textContent = r.message || 'Gagal login';
       }
