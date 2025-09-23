@@ -100,7 +100,7 @@
   <script>
   const $ = s => document.querySelector(s);
 
-  // --- Auth guard
+  // Auth guard
   const auth = JSON.parse(localStorage.getItem('auth') || '{}');
   if (!auth.nip || !auth.pin){ location.href = 'login.html'; }
   $('#hello').textContent = auth.nama ? `${auth.nama} • ${auth.nip}` : auth.nip;
@@ -108,7 +108,7 @@
   $('#pin').value = auth.pin;
   $('#logout').onclick = ()=>{ localStorage.removeItem('auth'); location.href='login.html'; };
 
-  // --- JSONP helper
+  // JSONP helper
   function getJSONP(url){
     return new Promise((resolve, reject)=>{
       const cb = 'cb'+Date.now();
@@ -116,12 +116,12 @@
       const tag = document.createElement('script');
       function cleanup(){ delete window[cb]; tag.remove(); }
       tag.src = url + (url.includes('?')?'&':'?') + 'cb=' + cb;
-      tag.onerror = ()=>{ cleanup(); reject(new Error('net')); };
+      tag.onerror = ()=>{ console.error('JSONP load error:', tag.src); cleanup(); reject(new Error('net')); };
       document.body.appendChild(tag);
     });
   }
 
-  // --- Kirim Absen via JSONP (hindari CORS)
+  // Kirim absen via JSONP
   $('#kirim').onclick = async ()=>{
     $('#kirimStatus').className='msg'; $('#kirimStatus').textContent='Mengirim...';
     try{
@@ -142,12 +142,11 @@
       $('#kirimStatus').textContent = j.ok ? j.message : (j.message || 'Gagal kirim');
       if (j.ok){ muatH(); muatB(); }
     }catch(e){
-      console.error(e);
-      $('#kirimStatus').className='msg err'; $('#kirimStatus').textContent='Gagal kirim';
+      $('#kirimStatus').className='msg err'; $('#kirimStatus').textContent='Gagal kirim: ' + e.message;
     }
   };
 
-  // --- Tabel harian & bulanan
+  // Render tabel harian/bulanan
   function renderH(data){
     const tb = $('#tblH tbody'); tb.innerHTML='';
     if (!data || !data.length){
