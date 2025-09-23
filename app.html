@@ -121,30 +121,32 @@
     });
   }
 
-  // Kirim absen via JSONP
-  $('#kirim').onclick = async ()=>{
-    $('#kirimStatus').className='msg'; $('#kirimStatus').textContent='Mengirim...';
-    try{
-      let lat='', lng='';
-      try {
-        const p = await new Promise((ok,er)=>navigator.geolocation.getCurrentPosition(ok,er,{timeout:5000}));
-        lat = p.coords.latitude; lng = p.coords.longitude;
-      }catch(_){}
+ // Kirim Absen (pakai JSONP agar lolos CORS)
+$('#kirim').onclick = async ()=>{
+  $('#kirimStatus').textContent = 'Mengirim...';
+  try {
+    let lat='', lng='';
+    try {
+      const p = await new Promise((ok,er)=>navigator.geolocation.getCurrentPosition(ok,er,{timeout:5000}));
+      lat = p.coords.latitude; lng = p.coords.longitude;
+    }catch(_){}
 
-      const u = `${window.API_URL}?action=submit`
-        + `&nip=${encodeURIComponent(auth.nip)}`
-        + `&pin=${encodeURIComponent($('#pin').value.trim())}`
-        + `&status=${encodeURIComponent($('#status').value)}`
-        + `&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`;
+    const url = `${window.API_URL}?action=submit`
+              + `&nip=${encodeURIComponent(auth.nip)}`
+              + `&pin=${encodeURIComponent($('#pin').value.trim())}`
+              + `&status=${encodeURIComponent($('#status').value)}`
+              + `&lat=${encodeURIComponent(lat)}`
+              + `&lng=${encodeURIComponent(lng)}`;
 
-      const j = await getJSONP(u);
-      $('#kirimStatus').className='msg ' + (j.ok?'ok':'err');
-      $('#kirimStatus').textContent = j.ok ? j.message : (j.message || 'Gagal kirim');
-      if (j.ok){ muatH(); muatB(); }
-    }catch(e){
-      $('#kirimStatus').className='msg err'; $('#kirimStatus').textContent='Gagal kirim: ' + e.message;
-    }
-  };
+    const j = await getJSONP(url);
+    $('#kirimStatus').textContent = j.ok ? j.message : (j.message||'Gagal kirim');
+    if (j.ok){ muatH(); muatB(); }
+  } catch(e){
+    console.error(e);
+    $('#kirimStatus').textContent = 'Gagal kirim';
+  }
+};
+
 
   // Render tabel harian/bulanan
   function renderH(data){
@@ -211,3 +213,4 @@
   </script>
 </body>
 </html>
+
