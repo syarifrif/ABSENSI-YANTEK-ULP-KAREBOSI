@@ -31,16 +31,17 @@
   const $ = s => document.querySelector(s);
 
   function getJSONP(url){
-    return new Promise((resolve,reject)=>{
-      const cb = 'cb'+Date.now();
-      window[cb] = d => { resolve(d); cleanup(); };
-      const tag = document.createElement('script');
-      function cleanup(){ delete window[cb]; tag.remove(); }
-      tag.src = url + (url.includes('?')?'&':'?') + 'cb=' + cb;
-      tag.onerror = ()=>{ cleanup(); reject(new Error('net')); };
-      document.body.appendChild(tag);
-    });
-  }
+  return new Promise((resolve, reject)=>{
+    const cb = 'cb'+Date.now();
+    window[cb] = d => { resolve(d); cleanup(); };
+    const tag = document.createElement('script');
+    function cleanup(){ delete window[cb]; tag.remove(); }
+    tag.src = url + (url.includes('?')?'&':'?') + 'cb=' + cb;
+    tag.onerror = ()=>{ console.error('JSONP load error:', tag.src); cleanup(); reject(new Error('net')); };
+    document.body.appendChild(tag);
+  });
+}
+
 
   $('#btn').onclick = async ()=>{
     $('#status').className='msg'; $('#status').textContent='Memeriksa...';
@@ -67,4 +68,5 @@
   </script>
 </body>
 </html>
+
 
